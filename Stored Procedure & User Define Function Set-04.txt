@@ -1,0 +1,56 @@
+-----**********Advanced\Complex Stored Procedure Interview Questions*********
+
+/*
+Q.Develop a stored to insert the records in the table using stored procedure. Below are the table schema
+Table: Student
+Column: StudentID, StudentName, StudentEmail, Course
+*/
+          
+Create table Students (StudentID int identity, StudentName Varchar(100), StudentEmail Varchar(100), Course Varchar(100))	  
+go
+Create Proc USP_InsertStudentData ( 
+		@StudentName Varchar(100), 
+		@StudentEmail Varchar(100), 
+		@Course Varchar(100)
+		)
+As 
+Begin
+   Insert into Students
+   Select @StudentName,@StudentEmail,@Course
+End
+ 
+ Exec USP_InsertStudentData @StudentName = 'John',@StudentEmail = 'John@Gmail.com',@Course='Data Analyst'
+
+ Exec USP_InsertStudentData @StudentName = 'Randy',@StudentEmail = 'Randy@Gmail.com',@Course='Data Scientist'
+
+ Select * from Students
+
+ /*
+ 
+ Q. Develop a stored procedure to find the total sales amount based on the below requirement
+ 1. Input Parameter is Country and this is optional parameter if user pass null than need to display all Country sales amount. 
+
+ */
+  
+ Alter Proc USP_GetSalesAmount (
+      @Country Varchar(100) = null
+	  )
+As 
+Begin
+ if ISNULL(@Country,'') <> ''
+ Begin
+Select d.SalesTerritoryCountry, sum(f.SalesAmount) as TotalSalesAmount
+from DimSalesTerritory d
+Join FactInternetSales f on f.SalesTerritoryKey = d.SalesTerritoryKey
+Group by d.SalesTerritoryCountry
+having d.SalesTerritoryCountry = @Country 
+End
+Else 
+Select d.SalesTerritoryCountry, sum(f.SalesAmount) as TotalSalesAmount
+from DimSalesTerritory d
+Join FactInternetSales f on f.SalesTerritoryKey = d.SalesTerritoryKey
+Group by d.SalesTerritoryCountry
+End
+go
+
+Exec USP_GetSalesAmount @Country = 'Canada'

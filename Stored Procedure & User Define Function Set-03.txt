@@ -1,0 +1,58 @@
+/*
+--Q. Develop a SP based on the below requirements
+1. Input parameter is Gender and must pass single value if user pass multiple values or 
+Null or empty Values  than will pre validate the SP and throw an error.
+2. If TotalChildren column value is greater than or equal to 3 than update YearlyIncome 
+with double.
+3. Display in the output with the Previous YearlyIncome and Updated YearlyIncome for the review.
+
+*/
+
+--Select * into dimcustomer from dimcustomer
+
+If Exists (Select 1 from sys.objects where name = 'UpdatebyGender' and type = 'p')
+drop proc UpdatebyGender
+go
+
+Create Proc dbo.UpdatebyGender(
+                @Gender varchar(10)
+				)
+As
+Begin
+
+-- Validate Null or empty Values
+
+if Isnull(@Gender,'') = ''
+Begin
+    Print'Error.Null or Empty is the Invalid Parameter, Please must pass the Values Either M or F'
+	return  -- Stop exec the SP
+end
+
+-- Validate Multiple values
+if CHARINDEX(',',@Gender)>0
+Begin
+    Print'Erro.Invalid Parameter, Please must pass single value'
+	return
+end
+
+Create table #dimcustomer (id int identity, Customerkey int, Yearlyincome money , Totalchildren int )
+Insert into #dimcustomer (Customerkey,Yearlyincome,Totalchildren)
+Select Customerkey,Yearlyincome,Totalchildren
+from dimcustomer Where Gender = @Gender and Totalchildren >=3
+
+create Clustered index IX_#dimcustomer on #dimcustomer(Customerkey)
+
+Update d
+Set d.YearlyIncome = 2*t.Yearlyincome
+from dimcustomer d 
+Inner Join #dimcustomer t on t.Customerkey = d.CustomerKey
+
+--Insert into #dimcustomer_Result(Customerkey,Yearlyincome_OLD,Yearlyincome_new,Totalchildren)
+select d.CustomerKey,t.Yearlyincome as Previous_Yearlyincome,d.YearlyIncome as Updated_YearlyIncome,d.TotalChildren
+from dimcustomer d
+Join #dimcustomer t on t.Customerkey = d.CustomerKey
+
+end
+Go
+
+ Exec UpdatebyGender @Gender = 'M' 
