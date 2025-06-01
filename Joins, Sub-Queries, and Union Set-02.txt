@@ -1,0 +1,37 @@
+--1. Find the product Name which sold most in the market and Generated more revenue
+
+Select d.ProductKey, d.EnglishProductName, COUNT(*) as TotalSold, sum(SalesAmount) as TotalRevenue
+from DimProduct d 
+Inner join FactInternetSales f on f.ProductKey = d.ProductKey
+Group by d.ProductKey, d.EnglishProductName
+order by 3 desc
+
+
+Select d.ProductKey, d.EnglishProductName, COUNT(*) as TotalSold, sum(SalesAmount) as TotalRevenue
+from DimProduct d 
+Inner join FactInternetSales f on f.ProductKey = d.ProductKey
+Group by d.ProductKey, d.EnglishProductName
+order by 4 desc
+
+--2. Find the total unit balance for each product.
+
+  Select d.ProductKey, d.EnglishProductName, count(UnitsBalance) As Total_UnitsBalance
+  from DimProduct d
+  Inner Join FactProductInventory f on f.ProductKey = d.ProductKey
+  Group by d.ProductKey, d.EnglishProductName
+  order by 3 desc
+
+
+/*
+3.Find the list of employees whose Firstname is starting with Vowel letter 
+and salary is greater than 25000 and Age is greater than 25 years 
+and working exp having more that 3 years.
+*/
+
+Select e.EmpID, e.FirstName, e.LastName,e.DeptID, s.Salary,s.Age,s.Experience_Years
+from  Employee e
+Inner Join Employee_Salary s on s.EmpID = e.EmpID
+Where left(FirstName,1) in ('a','e','i','o','u')
+And s.Salary > 25000
+And s.Age > 25
+And s.Experience_Years >=3

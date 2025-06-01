@@ -1,0 +1,45 @@
+--*********Questions Based on Joins & Sub-Queries***************
+
+/*1. Find the List of employees whose deptID is not available in the Department Table by 
+using join and subquery  */
+
+-- Join
+Select e.EmpID, e.FirstName, e.LastName,e.DeptID, d.DeptID,d.DeptName
+from Employee e
+Left Join Department d on e.DeptID = d.DeptID
+where d.DeptID is Null
+
+Select  * from Employee where EmpID = 3431
+Select * from Department
+
+--Using Sub Query
+
+Select EmpID, FirstName, LastName,DeptID
+from  Employee  where DeptID not in (Select DeptID from Department)
+
+--2. Find the training total cost of each departments
+Select d.DeptID, d.DeptName, Sum(t.Training_Cost) As TotalTrainingCost
+from Employee e
+Inner Join Department d on e.DeptID = d.DeptID
+Inner Join Employee_Training_Development t on t.Employee_ID = e.EmpID
+Group by d.DeptID, d.DeptName
+order by 3 desc
+
+/* 
+3. Find the List of employees based on the below condition:
+a. Engagement Score is greater than 3
+b. Salary is greater than 30000
+c. Training Program is Technical Skills
+d.  Employee is full time
+*/
+
+
+Select E.EmpID, FirstName, LastName,e.EmployeeClassificationType,sur.Engagement_Score,es.Salary, t.Training_Program_Name
+from Employee e
+Inner Join Employee_Salary es on es.EmpID = e.EmpID
+Inner Join Employee_Survey sur on sur.Employee_ID = e.EmpID
+Inner Join Employee_Training_Development t on t.Employee_ID = e.EmpID
+Where sur.Engagement_Score >3
+And es.Salary > 30000
+And t.Training_Program_Name = 'Technical Skills'
+and e.EmployeeClassificationType = 'Full-Time'

@@ -1,0 +1,27 @@
+--*********Questions Based on Joins***************
+
+--1. Find the list of all products sold via 'Television  Advertisement'
+
+Select CustomerKey, ProductKey, OrderDate, fnts.SalesOrderNumber, SalesAmount, TaxAmt, ShipDate, SalesReasonName
+from DimSalesReason ds
+Inner Join FactInternetSalesReason fint on ds.SalesReasonKey = ds.SalesReasonKey
+Inner Join FactInternetSales fnts on fnts.SalesOrderNumber = fint.SalesOrderNumber
+Where ds.SalesReasonName = 'Television  Advertisement'
+
+
+--2. Find the top 10 customer details who order more product.
+
+  Select top 10 d.CustomerKey, FirstName, LastName, COUNT(ProductKey) as TotalOrder
+  From DimCustomer d
+  Inner Join FactInternetSales f on d.CustomerKey = f.CustomerKey
+  Group by d.CustomerKey, FirstName, LastName
+  order by 4 desc
+
+
+--3.Find the top 10 customer details who generated higest revenue 
+
+  Select top 10 d.CustomerKey, FirstName, LastName, sum(SalesAmount) as TotalSales
+  From DimCustomer d
+  Inner Join FactInternetSales f on d.CustomerKey = f.CustomerKey
+  Group by d.CustomerKey, FirstName, LastName
+  order by 4 desc
