@@ -1,0 +1,54 @@
+/*
+Q. A company wants to track salary updates for employees.
+Write an AFTER UPDATE trigger on the Employees table that logs salary changes into the EmployeeSalaryAudit table.
+Trigger Requirements: Log only salary changes.And Capture OldSalary, NewSalary, and UpdatedBy.
+
+*/
+
+
+--drop table Employees 
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY ,
+    Name VARCHAR(100),
+    Salary DECIMAL(10,2),
+    UpdatedBy VARCHAR(50),
+    UpdatedAt DATETIME DEFAULT GETDATE()
+);
+
+INSERT INTO Employees (EmployeeID, Name, Salary, UpdatedBy)
+VALUES (1, 'John Doe', 5000, 'Admin'), 
+       (2, 'Jane Smith', 6000, 'HR');
+
+CREATE TABLE EmployeeSalaryAudit (
+    AuditID INT IDENTITY(1,1) PRIMARY KEY,
+    EmployeeID INT,
+    OldSalary DECIMAL(10,2),
+    NewSalary DECIMAL(10,2),
+    UpdatedBy VARCHAR(50),
+    UpdatedAt DATETIME DEFAULT GETDATE()
+);
+
+Select * from Employees
+Select * from EmployeeSalaryAudit
+
+Go
+
+CREATE TRIGGER trg_EmployeeSalaryAudit
+ON Employees
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    INSERT INTO EmployeeSalaryAudit (EmployeeID, OldSalary, NewSalary, UpdatedBy, UpdatedAt)
+    SELECT i.EmployeeID, d.Salary, i.Salary, i.UpdatedBy, GETDATE()
+    FROM inserted i
+    JOIN deleted d ON i.EmployeeID = d.EmployeeID
+    WHERE i.Salary <> d.Salary;
+END;
+
+Select * from Employees
+Select * from EmployeeSalaryAudit
+
+-- Update salary to trigger audit log
+UPDATE Employees SET Salary = 8000, UpdatedBy = 'Admin' WHERE EmployeeID = 1;
