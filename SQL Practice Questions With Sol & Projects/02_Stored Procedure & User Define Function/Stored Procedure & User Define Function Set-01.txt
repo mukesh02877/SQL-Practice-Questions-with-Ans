@@ -1,0 +1,51 @@
+/* ------Create the stored procedure based on below requirements and the input parameter is EnglishEducation
+  1.  if EnglishEducation = Bachelors update email adress domain as google.com
+  2.  if EnglishEducation = Partial College update email adress domain as yahoo.com
+  3.  if EnglishEducation = Graduate Degree update email adress domain as FB.com
+  3.  if EnglishEducation = otherthan above values update email adress domain as abc.com
+  4.  If Parameter values supplied is not available in the database print the Error Message.
+  */
+
+
+
+Create OR ALTER Proc UpdateEmail(@EnglishEducation varchar(100))
+As 
+Begin
+ If Not Exists (Select  null from dimcustomer where EnglishEducation = @EnglishEducation)
+  Begin
+     Print'The Input values is incoorect.'
+	 return
+  End
+	 If @EnglishEducation = 'Bachelors'
+	 Begin
+		 Update dimcustomer
+		 Set EmailAddress = REPLACE(EmailAddress,'adventure-works.com','google.com')
+		 Where EnglishEducation = @EnglishEducation
+	 End
+	 If @EnglishEducation = 'Partial College'
+	 Begin
+		 Update dimcustomer
+		 Set EmailAddress = REPLACE(EmailAddress,'adventure-works.com','yahoo.com')
+		 Where EnglishEducation = @EnglishEducation
+	 End
+
+	 If @EnglishEducation = 'Graduate Degree'
+	 Begin
+	      Update dimcustomer
+		 Set EmailAddress = REPLACE(EmailAddress,'adventure-works.com','fb.com')
+		 Where EnglishEducation = @EnglishEducation
+	 End
+
+	 If @EnglishEducation Not in('Bachelors', 'Partial College','Graduate Degree')
+	 Begin
+	      Update dimcustomer
+		 Set EmailAddress = REPLACE(EmailAddress,'adventure-works.com','abc.com')
+		 Where EnglishEducation = @EnglishEducation
+	 End
+End
+
+Go
+
+Select * from dimcustomer
+
+Exec UpdateEmail @EnglishEducation = 'Bachelors'

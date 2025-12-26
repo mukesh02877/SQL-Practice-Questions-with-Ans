@@ -1,0 +1,38 @@
+
+-- Create Table
+CREATE TABLE MatchResults (
+    MatchID INT IDENTITY(1,1) PRIMARY KEY,
+    Team1 VARCHAR(50),
+    Team2 VARCHAR(50),
+    Winner VARCHAR(50)
+);
+
+-- Insert 20 Records
+INSERT INTO MatchResults (Team1, Team2, Winner) VALUES
+('India', 'Pakistan', 'India'),
+('India', 'SriLanka', 'India'),
+('SriLanka', 'Pakistan', 'SriLanka'),
+('Bangladesh', 'Pakistan', 'Pakistan'),
+('SriLanka', 'Bangladesh', 'SriLanka'),
+('Bangladesh', 'India', 'India'),
+('India', 'Australia', 'Australia'),
+('Pakistan', 'Australia', 'Pakistan'),
+('India', 'England', 'India'),
+('England', 'Pakistan', 'England'),
+('SriLanka', 'Australia', 'Australia'),
+('Bangladesh', 'England', 'England'),
+('India', 'South Africa', 'India'),
+('South Africa', 'Pakistan', 'South Africa'),
+('SriLanka', 'West Indies', 'SriLanka'),
+('West Indies', 'India', 'India'),
+('Pakistan', 'Bangladesh', 'Pakistan'),
+('England', 'South Africa', 'South Africa'),
+('Australia', 'West Indies', 'Australia'),
+('India', 'West Indies', 'India');
+
+
+Select * from MatchResults
+
+
+
+---------------

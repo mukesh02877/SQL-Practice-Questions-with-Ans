@@ -1,0 +1,49 @@
+/*
+Q.Develop a stored procedure based on the below requirements
+1. Input parameter: EnglishEducation
+2. Fine Total number of Customer and Total YealyIncome.
+3. If user pass parameter multiple values at a time like 'Bachelors,Partial College' 
+   SP will display an error 'Invalid Parameter'
+Table: DimCustomer(AdventureWorks Database)
+*/
+
+Alter Procedure USP_GetCustCount(@EnglishEducation varchar(100))
+As 
+Begin
+if CHARINDEX(',',@EnglishEducation) > 0
+Begin
+     Print 'Invalid Parameter'
+	 Return
+End
+Declare @TotalCustomer int, @TotalYealyIncome int
+
+Select EnglishEducation,count(CustomerKey) As TotalCustomer, Sum(YearlyIncome) as  TotalYealyIncome
+from DimCustomer
+Group by EnglishEducation
+Having EnglishEducation = @EnglishEducation
+
+End
+go
+
+Exec USP_GetCustCount @EnglishEducation = 'Bachelors'
+
+
+
+--Q. Create a SP with Output parameter to find total no of Employee based on gender
+
+Select * from DimEmployee
+
+Create procedure USP_GetTotalEmp 
+(@Gender varchar(10),
+ @TotalEmp int output
+)
+As
+Begin
+  Select @TotalEmp = count(EmployeeKey)
+  from DimEmployee where Gender = @Gender
+
+End
+
+Declare @EmpTotalcount int
+Exec USP_GetTotalEmp @Gender = 'M',@TotalEmp = @EmpTotalcount output
+Select @EmpTotalcount

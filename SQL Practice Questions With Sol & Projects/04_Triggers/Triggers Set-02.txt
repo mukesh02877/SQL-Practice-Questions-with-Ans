@@ -1,0 +1,62 @@
+
+/*
+Scenario: A retail system should prevent deletion of customers who have pending orders.
+Problem Statement: Write an INSTEAD OF DELETE trigger on the Customers table that prevents deletion if the customer has pending orders.
+Trigger Requirements: Prevent deletion if the customer has OrderStatus = 'Pending'. And Raise an error message.
+*/
+
+DROP TABLE IF EXISTS Customer;
+CREATE TABLE Customer (
+    CustomerID INT PRIMARY KEY,
+    Name VARCHAR(100),
+    Status VARCHAR(20) CHECK (Status IN ('Active', 'Inactive'))
+);
+
+DROP TABLE IF EXISTS Orders;
+CREATE TABLE Orders (
+    OrderID INT PRIMARY KEY,
+    CustomerID INT FOREIGN KEY REFERENCES Customer(CustomerID),
+    OrderStatus VARCHAR(20) CHECK (OrderStatus IN ('Pending', 'Shipped', 'Delivered'))
+);
+
+INSERT INTO Customer (CustomerID, Name, Status)
+VALUES (1, 'Alice Johnson', 'Active'), 
+       (2, 'Bob Brown', 'Inactive');
+
+INSERT INTO Orders (OrderID, CustomerID, OrderStatus)
+VALUES (1, 1, 'Pending'), 
+       (2, 2, 'Shipped');
+
+Select * from Customer
+Select * from Orders
+
+Go
+
+CREATE TRIGGER trg_PreventActiveCustomerDeletions
+ON Customer
+INSTEAD OF DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    IF EXISTS (SELECT 1 FROM deleted d JOIN Orders o ON d.CustomerID = o.CustomerID WHERE o.OrderStatus = 'Pending')
+    BEGIN
+        RAISERROR ('Cannot delete customer with pending orders.', 16, 1);
+        RETURN;
+    END
+
+    DELETE FROM Customer WHERE CustomerID IN (SELECT CustomerID FROM deleted);
+END;
+
+-- Attempt to delete active customer with pending order (should fail)
+DELETE FROM Customer WHERE CustomerID = 1;
+
+-- Delete inactive customer (should succeed)
+DELETE FROM Customer WHERE CustomerID = 2;
+
+
+Select * from Customer
+Select * from Orders
+
+Delete from Orders where CustomerID = 2
+

@@ -1,0 +1,114 @@
+
+-- Real-time Index Scenario Questions with Sample Data and Questions
+
+-- 1. Orders Table
+CREATE TABLE Orders (
+    OrderID INT PRIMARY KEY,
+    CustomerID INT,
+    OrderDate DATE,
+    TotalAmount DECIMAL(10,2)
+);
+
+INSERT INTO Orders (OrderID, CustomerID, OrderDate, TotalAmount) VALUES
+(1, 101, '2025-01-10', 5000.00),
+(2, 102, '2025-01-15', 15000.00),
+(3, 103, '2025-02-05', 7500.00),
+(4, 101, '2025-03-12', 20000.00);
+
+-- 2. Customers Table
+Drop table Customers
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY,
+    Name NVARCHAR(100),
+    City NVARCHAR(50),
+    Country NVARCHAR(50)
+);
+
+INSERT INTO Customers (CustomerID, Name, City, Country) VALUES
+(101, 'Alice', 'Hyderabad', 'India'),
+(102, 'Bob', 'Mumbai', 'India'),
+(103, 'Charlie', 'Hyderabad', 'India');
+
+-- 3. Employees Table
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY,
+    Name NVARCHAR(100),
+    DepartmentID INT,
+    Salary DECIMAL(10,2),
+    Status NVARCHAR(10)
+);
+
+INSERT INTO Employees (EmployeeID, Name, DepartmentID, Salary, Status) VALUES
+(1, 'John', 10, 50000, 'Active'),
+(2, 'Emma', 20, 60000, 'Inactive'),
+(3, 'Mike', 10, 55000, 'Active');
+
+-- 4. Sales Table
+CREATE TABLE Sales (
+    SaleID INT,
+    ProductID INT,
+    SaleDate DATE,
+    Quantity INT,
+    Amount DECIMAL(10,2)
+);
+
+INSERT INTO Sales (SaleID, ProductID, SaleDate, Quantity, Amount) VALUES
+(1, 201, '2025-01-01', 10, 1000),
+(2, 202, '2025-01-02', 5, 500),
+(3, 201, '2025-02-01', 8, 800),
+(4, 203, '2025-03-01', 12, 1200);
+
+/*
+-- Real-Time Index Scenario Questions with Answers --
+
+1. Question: Why would you create a clustered index on Orders(OrderID)?
+Answer: It sorts the table physically by OrderID and improves range queries.
+Query Example:
+SELECT * FROM Orders WHERE OrderID BETWEEN 1 AND 3;
+
+2. Question: How to optimize queries filtering Customers by City?
+Answer: Create a non-clustered index on City.
+Query Example:
+SELECT Name, City FROM Customers WHERE City = 'Hyderabad';
+
+3. Question: How to optimize queries for high-value orders (TotalAmount > 10000)?
+Answer: Create a filtered index on Orders(TotalAmount > 10000).
+Query Example:
+SELECT OrderID, TotalAmount FROM Orders WHERE TotalAmount > 10000;
+
+4. Question: How to reduce I/O when selecting only Name and DepartmentID from Employees?
+Answer: Create a covering index on Name and include DepartmentID.
+Query Example:
+SELECT Name, DepartmentID FROM Employees WHERE Name LIKE 'J%';
+
+5. Question: How to improve performance of aggregate queries on Sales?
+Answer: Create a columnstore index.
+Query Example:
+SELECT ProductID, SUM(Amount) as TotalAmount FROM Sales GROUP BY ProductID;
+
+6. Question: Which index to create for frequent TransactionDate range queries?
+Answer: Keep clustered index on primary key, create non-clustered index on TransactionDate.
+Query Example:
+-- CREATE NONCLUSTERED INDEX IDX_Transactions_Date ON Transactions(TransactionDate);
+-- SELECT * FROM Transactions WHERE TransactionDate BETWEEN '2025-01-01' AND '2025-06-30';
+
+7. Question: How to optimize queries filtering Orders by CustomerID and OrderDate?
+Answer: Create a composite index on (CustomerID, OrderDate).
+Query Example:
+SELECT * FROM Orders WHERE CustomerID = 101 AND OrderDate BETWEEN '2025-01-01' AND '2025-03-31';
+
+8. Question: How to optimize queries fetching only Active employees' Name and Salary?
+Answer: Create a filtered + covering index on Employees(Name) include Salary WHERE Status = 'Active'.
+Query Example:
+SELECT Name, Salary FROM Employees WHERE Status = 'Active';
+
+9. Question: How to improve analytics on a partitioned Sales table?
+Answer: Create a clustered columnstore index.
+Query Example:
+SELECT YEAR(SaleDate) AS Year, MONTH(SaleDate) AS Month, SUM(Amount) FROM Sales GROUP BY YEAR(SaleDate), MONTH(SaleDate);
+
+10. Question: How to find missing indexes suggested by SQL Server?
+Answer: Query sys.dm_db_missing_index_details.
+Query Example:
+SELECT * FROM sys.dm_db_missing_index_details WHERE database_id = DB_ID();
+*/

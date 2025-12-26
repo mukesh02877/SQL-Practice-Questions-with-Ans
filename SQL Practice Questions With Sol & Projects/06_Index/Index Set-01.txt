@@ -1,0 +1,52 @@
+
+
+-------***** Questions Based on Index **********--------------------
+
+--Q. What is Difference Between Clustered Index & Non-Clustered Index
+
+--Clustered Index: 1.Physically sort the data,2. Perform Index Seek
+--Non-Clustered Index: 1.Physically not sort the data. 2. Perform Table scane
+
+DROP TABLE IF EXISTS dbo.Employee_Index
+CREATE TABLE Employee_Index
+(
+Emp_ID INT ,
+Emp_name Varchar(100),
+Emp_Sal int 
+)
+--- Insert data into table manually in all column
+
+INSERT INTO Employee_Index VALUES (1,'Anees',1000)
+INSERT INTO Employee_Index VALUES (5,'Rick',1200)
+INSERT INTO Employee_Index VALUES (4,'John',1100);
+INSERT INTO Employee_Index VALUES (2,'Stephen',900);
+INSERT INTO Employee_Index VALUES (3,'Maria',1400)
+
+Select * from Employee_Index
+---500K ---EMPID=4 --459
+
+Select * from Employee_Index where Emp_ID = 4
+
+
+Create CLUSTERED index IX_Employee_Index on Employee_Index(Emp_ID)
+
+sp_help Employee_Index
+
+DROP TABLE IF EXISTS dbo.Employee_NonCIndex
+CREATE TABLE Employee_NonCIndex
+(
+Emp_ID INT ,
+Emp_name Varchar(100),
+Emp_Sal int 
+)
+
+INSERT INTO Employee_NonCIndex VALUES (1,'Anees',1000)
+INSERT INTO Employee_NonCIndex VALUES (5,'Rick',1200)
+INSERT INTO Employee_NonCIndex VALUES (4,'John',1100);
+INSERT INTO Employee_NonCIndex VALUES (2,'Stephen',900);
+INSERT INTO Employee_NonCIndex VALUES (3,'Maria',1400)
+
+Select * from Employee_NonCIndex where Emp_ID = 4
+
+
+Create NONCLUSTERED index IX_Employee_NonCIndex on Employee_NonCIndex(Emp_ID)

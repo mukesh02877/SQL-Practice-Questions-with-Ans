@@ -1,0 +1,37 @@
+CREATE PROCEDURE usp_GetMemberClaimsSummary
+    @StartDate DATE,
+    @EndDate DATE,
+    @Status VARCHAR(20)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Bad practice: SELECT * and no filters early
+    SELECT *
+    INTO #AllClaims
+    FROM Claims; ---500 M
+
+    -- Bad practice: filter late and no indexes on temp table
+    SELECT m.MemberID, m.FullName, COUNT(c.ClaimID) AS TotalClaims, SUM(c.PaidAmount) AS TotalPaid
+    FROM #AllClaims c
+    INNER JOIN Members m ON c.MemberID = m.MemberID
+    WHERE c.ClaimDate BETWEEN @StartDate AND @EndDate
+      AND c.Status = @Status
+    GROUP BY m.MemberID, m.FullName
+    ORDER BY TotalPaid DESC;
+
+    DROP TABLE #AllClaims;
+END
+
+/*
+Problems:
+
+Full table scan on Claims
+Filters applied after copying all rows to temp table
+SELECT * pulls unnecessary columns
+No indexes on temp table
+No statistics update
+No parameter sniffing handling
+
+
+*/

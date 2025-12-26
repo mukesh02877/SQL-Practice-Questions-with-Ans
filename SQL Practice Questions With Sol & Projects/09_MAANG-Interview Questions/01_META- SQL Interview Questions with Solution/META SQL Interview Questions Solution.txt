@@ -1,0 +1,31 @@
+
+/*
+1.	Matches played by each team
+2.	Matches won by each team
+3.	Matches lost by each team
+4.	Total points earned (2 points per win)
+*/
+
+-- Matches played, won, lost, and points per team
+WITH Matches AS (
+    SELECT Team1 AS Team, Team2, Winner FROM MatchResults
+    UNION ALL
+    SELECT Team2 AS Team, Team1, Winner FROM MatchResults
+),
+Stats AS (
+    SELECT 
+        Team,
+        COUNT(*) AS MatchesPlayed,
+        SUM(CASE WHEN Team = Winner THEN 1 ELSE 0 END) AS MatchesWon,
+        SUM(CASE WHEN Team <> Winner THEN 1 ELSE 0 END) AS MatchesLost
+    FROM Matches
+    GROUP BY Team
+)
+SELECT 
+    Team,
+    MatchesPlayed,
+    MatchesWon,
+    MatchesLost,
+    MatchesWon * 2 AS TotalPoints
+FROM Stats
+ORDER BY TotalPoints DESC;

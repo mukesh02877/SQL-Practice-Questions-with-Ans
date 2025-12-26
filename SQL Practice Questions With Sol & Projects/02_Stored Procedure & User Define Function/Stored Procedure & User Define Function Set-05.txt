@@ -1,0 +1,57 @@
+
+-----**********User Define function Interview Questions*********
+-- Develop a User define funcion to maintain the FirstName and LastName as first Letter as capital and remaining as small
+-- Example: Kevin,David
+
+Update DimEmployee
+Set FirstName = LOWER(FirstName)
+where EmployeeKey between 1 and 10
+
+Update DimEmployee
+Set LastName = LOWER(LastName)
+where EmployeeKey between 20 and 30
+
+
+Select * from DimEmployee 
+
+Create function GetStanderdName
+   (
+   @Name varchar(100)
+   )
+  returns Varchar(100)
+As
+Begin
+return (Select UPPER(Left(@Name,1))+SUBSTRING(@Name,2,Len(@Name)))
+
+End
+
+Select dbo.GetStanderdName(FirstName) as FirstName ,dbo.GetStanderdName(LastName) as LastName ,*
+from DimEmployee
+
+---------------------
+
+--Q. Write a UDF to Display the new Email Address with the combination of first Letter of firstname and last name.
+
+if exists (Select null from dbo.SysObjects where name = N'UpdateEmailAddress' and type in (N'F', N'TF'))
+Begin
+	Drop function dbo.UpdateEmailAddress
+End
+Go
+Create function dbo.UpdateEmailAddress
+    (
+     @CutomerKey int
+    )
+    returns varchar(2000)
+    As
+    Begin 
+	Declare @email varchar(2000), @Login varchar(100)
+	set @Login = null
+	Set @email = null
+	Select @Login = Lower(left(FirstName,1)) + Lower(LastName) from DimCustomer where Customerkey = @CutomerKey
+	Select @email = Stuff(EmailAddress,1,CHARINDEX('@a',EmailAddress)-1,@Login) from DimCustomer where Customerkey = @CutomerKey
+
+	return @email;
+    End
+go
+
+Select dbo.UpdateEmailAddress(CustomerKey),* from DimCustomer

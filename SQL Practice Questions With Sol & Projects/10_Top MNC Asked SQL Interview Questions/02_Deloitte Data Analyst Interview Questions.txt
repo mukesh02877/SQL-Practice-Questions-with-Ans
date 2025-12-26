@@ -1,0 +1,70 @@
+
+--***Deloitte Data Analyst Interview Questions******
+
+--1.  How to Capture Deleted Rows Without Trigger?
+
+CREATE TABLE MainTab (ID1 INT, Col1 VARCHAR(100))
+GO
+CREATE TABLE DeletedTab (ID3 INT, Col3 VARCHAR(100))
+GO 
+
+INSERT INTO MainTab (ID1, Col1)
+VALUES(1,'Col'), (2, 'Col2')
+GO
+
+Select * from MainTab
+
+-- Delete Data
+DELETE FROM MainTab
+OUTPUT deleted.ID1, deleted.Col1
+INTO DeletedTab
+WHERE ID1 = 1
+
+SELECT *
+FROM DeletedTab;
+
+SELECT *
+FROM MainTab;
+
+--2. How to Combine Time and Date in SQL SERVER?
+
+DECLARE @dt DATE = '2020-07-12'
+DECLARE @tm TIME = '07:01:01.000'
+SELECT CAST(@dt AS DATETIME) + CAST(@tm AS DATETIME) AS [CombineDateTime]
+
+DECLARE @dt1 DATE = '2020-07-12'
+DECLARE @tm1 TIME = '07:01:01.000'
+SELECT DATEADD(DAY,DATEDIFF(DAY, 0, @dt1),CAST(@tm1 AS DATETIME)) AS [CombineDateTime]
+
+--3. How to Insert Multiple Values into Multiple Tables in a Single Statement?
+CREATE TABLE Table1 (ID1 INT, Col1 VARCHAR(100))
+GO
+CREATE TABLE Table2 (ID2 INT, Col2 VARCHAR(100))
+GO
+
+-- Inserted, Deleted
+INSERT INTO Table1 (ID1, Col1)
+OUTPUT inserted.ID1, inserted.Col1
+INTO Table2
+VALUES(1,'Col'), (2, 'Col2')
+GO
+
+Select * from Table1
+
+Select * from Table2
+
+--4. Find All Tables Containing Specific Column Name
+Select * from DimProduct
+
+SELECT      c.name  AS 'ColumnName'
+            ,t.name AS 'TableName'
+FROM        sys.columns c
+JOIN        sys.tables  t   ON c.object_id = t.object_id
+WHERE       c.name LIKE '%Employeekey%'
+ORDER BY    TableName
+            ,ColumnName;
+
+--5. How to Get Random Records from Table?
+SELECT FirstName, LastName
+FROM [Person].[Person]
+ORDER BY CHECKSUM(NEWID());

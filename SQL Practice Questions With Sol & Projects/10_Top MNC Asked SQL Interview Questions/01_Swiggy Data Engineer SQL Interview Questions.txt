@@ -1,0 +1,50 @@
+
+---****** Swiggy Data Engineer SQL Interview Questions*********************
+
+--1. Find the DepratmentName longest and shortest name
+If Exists ( Select null from Sysobjects Where Name = 'Dept' and type = 'U')
+Drop table Dept
+Create Table Dept(
+DepartID INT,
+DeptName Varchar(20)
+)
+
+Insert into DEPT values(1,'IT'),(2,'HR'),(3,'Marketing'),(4,'Operation'),(5,'MIS'),(6,'Admin')
+select * from dept
+
+;With CTE
+As
+(
+SELECT top 1 DeptName,LEN(DeptName) as Length FROM Dept 
+WHERE LEN(DeptName) IN (SELECT MAX(LEN(DeptName)) FROM Dept)
+UNION
+SELECT top 1 DeptName, LEN(DeptName) as Length FROM Dept  
+WHERE LEN(DeptName) IN (SELECT MIN(LEN(DeptName)) FROM Dept)
+)
+Select * from CTE order by 2 desc
+
+--2.Write down the query to print first letter of a Name in Upper Case and all other letter in Lower Case.
+
+Update DimEmployee
+Set FirstName = LOWER(FirstName)
+
+Select * from DimEmployee
+
+Select UPPER(Left(FirstName,1)),SUBSTRING(FirstName,2,Len(FirstName)) , * from DimEmployee
+
+Update DimEmployee
+Set FirstName = UPPER(Left(FirstName,1))+SUBSTRING(FirstName,2,Len(FirstName))
+
+Select * from DimEmployee 
+
+--3. Write down the query to display all employee name in one cell seprated by ',' ex:-"Vikas, nikita, Ashish, Nikhil , anish"
+
+SELECT STUFF(( SELECT ', ' + E.FirstName FROM [DimEmployee] AS E FOR XML PATH('')), 1, 2, '') 
+AS [AllEmp Name] 
+
+--4. What is the very useful datatype introduced in SQL Server 2016?
+--Ans: JSON datatype
+
+--How large is VARCHAR(MAX)?
+--Ans: 8000 Bytes in line.
+

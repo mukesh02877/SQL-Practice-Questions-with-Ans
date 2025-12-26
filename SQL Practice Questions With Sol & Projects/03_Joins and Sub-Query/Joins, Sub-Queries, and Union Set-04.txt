@@ -1,0 +1,59 @@
+
+/*
+--1. Find the List of employees based on the below condition:
+a. Engagement Score is greater than 3
+b. Salary is greater than 30000
+c. Training Program is Technical Skills
+d.  Employee is full time
+*/
+
+Select E.EmpID, FirstName, LastName,e.EmployeeClassificationType,sur.Engagement_Score,es.Salary, t.Training_Program_Name
+from Employee e
+Inner Join Employee_Salary es on es.EmpID = e.EmpID
+Inner Join Employee_Survey sur on sur.Employee_ID = e.EmpID
+Inner Join Employee_Training_Development t on t.Employee_ID = e.EmpID
+Where sur.Engagement_Score >3
+And es.Salary > 30000
+And t.Training_Program_Name = 'Technical Skills'
+and e.EmployeeClassificationType = 'Full-Time'
+
+
+--2.Find the Employee details who have higest Satisfaction_Score
+
+Select E.EmpID, FirstName, LastName, Satisfaction_Score
+from Employee e
+Inner Join Employee_Survey s on e.EmpID = s.Employee_ID
+Order by Satisfaction_Score desc
+
+--3.Write a SQL Query to find the 5th Higest Higest Salary using sub Query\ in single select statement
+
+Select * from (Select dense_rank() over (order by Salary desc) As RNK,* 
+from  Employee_Salary ) k  Where k.RNK =5
+
+Create Table Sales (sale_id int, product_id int, [year] int, quantity int,price int)
+Insert into Sales
+Select 1,100,2008,10,5000
+Union
+select 2,100,2009,12,5000
+Union 
+Select 7, 200,2011,15,9000
+
+--Select * from Sales
+
+Create table Product ( product_id int, product_name Varchar(100))
+Insert into Product
+Select 100,'Nokia'
+Union
+Select 200,'Apple'
+Union
+Select 300, 'Samsung'
+
+Select * from Sales
+Select * from Product
+
+--4. Write an SQL query that selects the product id, year, quantity, and price for the first year of every product sold.
+
+select s.product_id, s.year as first_year, quantity, price 
+from Sales s
+Join (select product_id, min(year) as year from Sales group by product_id) as p 
+on p.product_id = s.product_id And p.year = s.year

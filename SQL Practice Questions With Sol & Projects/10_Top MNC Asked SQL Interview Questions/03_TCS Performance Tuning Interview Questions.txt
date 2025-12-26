@@ -1,0 +1,23 @@
+--** TCS Performance Tuning Interview Questions****
+
+/*
+Q. We have complex stored procedure (2000 line code). Till last week performance
+was good and suddenly the execution time is increase from 2 min to 20 minutes.
+How can increase the performance of the stored procedure.
+*/
+--CDC: Change Data Capture
+-- Full load: emp(S)--1M -- DW DimEmp:1M
+-- Increamental: emp(S)--1.15 M --DimEmp-.15 M
+-- Ex xyz proc name: 50
+-- 1. Debug code 
+--2. We need find reason: 
+--a. 5 table 1-2
+--b. incorrect join 
+--c. clear cache
+
+--USE Common Table Expressions (CTEs) instead of Temp table
+--Use UNION ALL instead of UNION
+--
+--Table Scaning: DimCustomer: --- 20 Place -- Convert into CTE lile CTE_Customer
+--Implement Filter Index, Column Stored Index
+

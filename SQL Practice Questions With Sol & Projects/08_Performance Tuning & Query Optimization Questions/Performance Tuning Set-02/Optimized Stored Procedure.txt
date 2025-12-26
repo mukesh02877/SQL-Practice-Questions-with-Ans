@@ -1,0 +1,43 @@
+CREATE PROCEDURE usp_GetMemberClaimsSummary
+    @StartDate DATE,
+    @EndDate DATE,
+    @Status VARCHAR(20)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Use only required columns and filter early
+    SELECT ClaimID, MemberID, PaidAmount
+    INTO #FilteredClaims
+    FROM Claims WITH (NOLOCK)
+    WHERE ClaimDate BETWEEN @StartDate AND @EndDate
+      AND Status = @Status;
+
+    -- Add index on temp table for join
+    CREATE CLUSTERED INDEX IX_FC_MemberID ON #FilteredClaims(MemberID);
+
+    -- Join only filtered data
+    SELECT 
+        m.MemberID, 
+        m.FullName, 
+        COUNT(fc.ClaimID) AS TotalClaims, 
+        SUM(fc.PaidAmount) AS TotalPaid
+    FROM #FilteredClaims fc
+    INNER JOIN Members m ON fc.MemberID = m.MemberID
+    GROUP BY m.MemberID, m.FullName
+    ORDER BY TotalPaid DESC;
+
+    DROP TABLE #FilteredClaims;
+END
+
+/*
+
+Why This is Faster
+
+Filters are applied before joining with Members
+Only needed columns are selected (reducing IO)
+Index on temp table improves join and grouping
+Uses set-based logic instead of row-by-row
+Keeps execution plan stable (less parameter sniffing risk)
+
+*/
